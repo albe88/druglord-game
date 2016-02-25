@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Phaser exercise</title>
+        <script src="lib/jquery-2.2.1.min.js"></script>
+        <script src="lib/phaser.min.js"></script>
+        <script src="lib/amplify/amplify.min.js"></script>
+        <script src="scripts/config.js"></script>       
+        <script src="scripts/model.js"></script>
+        <script src="scripts/controller.js"></script>
+        <script src="scripts/view.js"></script>
+        <script src="scripts/script.js"></script>
+        <!--<script src="scripts/game.js"></script>-->
+        <style type="text/css">
+            canvas {
+                margin: 0 auto;
+
+            }
+            h1 {
+                font-size: 2em;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>phaser</h1>
+        
+        <div id="characterWindow"></div>
+
+        <template id="insertCharacter">
+            <!-- INSERT CHARACTER -->
+            <form>
+            <input id="insertCharacterName" type="text" data-input="characterName">
+            <select id="insertCharacterType" data-input="characterName"></select>
+            <button id="insertCharacterSubmit" data-control="App.controller.createNewPlayer" data-related-input="">Aggiungi un giocatore</button>
+            </form>
+
+            <script type="text/javascript">
+            (function(){
+                var $type = jQuery('#insertCharacterType');
+                var $name = jQuery('#insertCharacterName')
+                var $submit = jQuery('#insertCharacterSubmit')
+                for(c in App.config.characters){
+                    $type.append("<option value=" + c + ">" + c + "</opton>");
+                }
+                
+                $submit.on('click', function(ev){
+                    ev.preventDefault();    
+                    var name = $name.val();
+                    var type = $type.val();
+                    amplify.publish("Player:submittedNewCharacter", {characterName: name, characterType: type });
+                });
+            })()
+            </script>
+        </template>
+
+        <template id="character">
+            <span id="characterName"></span>
+            <span id="characterType"></span>
+            <span id="characterMoney"></span>
+            <script type="text/javascript">
+            (function(){
+                var curCharacter = App.model.players[App.model.state.currentCharacter];
+                var $name = jQuery('#characterName');
+                var $type = jQuery('#characterType');
+                var $money = jQuery('#characterMoney');
+                $name.html(curCharacter.name);
+                $type.html(curCharacter.type);
+                $money.html(curCharacter.money);
+            })()
+            </script>
+        </template>
+
+        <template id="market">
+            <span id="characterName"></span>
+            <span id="characterType"></span>
+            <span id="characterMoney"></span>
+            <script type="text/javascript">
+            (function(){
+                var curEnvironment = App.model.state.currentEnvironment;
+                var $name = jQuery('#characterName');
+                var $type = jQuery('#characterType');
+                var $money = jQuery('#characterMoney');
+                $name.html(curEnvironment.name);
+                $type.html(curEnvironment.type);
+                $money.html(curEnvironment.money);
+            })()
+            </script>
+        </template>
+
+    </body>
+</html>
