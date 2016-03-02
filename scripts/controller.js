@@ -21,9 +21,15 @@ App.controller = {
 			App.controller.createNewPlayer(data.characterType, data.characterName);
 		});
 		amplify.subscribe("Player:created", function(data) {
+			App.model.instanceEnvironments();
 			App.view.renderCharacter(data.playerName);
-			app.view.renderEnvironment(App.model.state.currentEnvironment);
 		});
+		amplify.subscribe("Environment:environmentChanged", function(data){
+			App.view.renderEnvironment(data.environment);
+		})
+		amplify.subscribe("Player:buyGood", function(data){
+			App.controller.buy(data.good, data.qty);
+		})
 	},
 
 	//init

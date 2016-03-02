@@ -1,0 +1,11 @@
+TODO:
+all'init instanziare environments oltre ai players
+
+- implementare AI avversari
+- implementare phaser 
+- tilemap
+- environments
+- randomizzatore di eventi e marketplaces
+- data binding?
+http://www.html5gamedevs.com/topic/5542-hudmanager-bringing-angularjs-style-data-binding-to-your-games-hud-demo-and-source/
+https://github.com/photonstorm/phaser3/issues/1

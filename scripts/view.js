@@ -21,5 +21,8 @@ App.view = {
     	jQuery('#marketWindow').html('');
     	App.view.appendTemplate("market", "#marketWindow");
     },
+    removeTemplate: function(fatherSelector){
+        jQuery(fatherSelector).html('');
+    }
 
 }

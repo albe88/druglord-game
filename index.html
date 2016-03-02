@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <title>Phaser exercise</title>
         <script src="lib/jquery-2.2.1.min.js"></script>
+        <script src="lib/jquery-ui/jquery-ui.min.js"></script>
         <script src="lib/phaser.min.js"></script>
         <script src="lib/amplify/amplify.min.js"></script>
         <script src="scripts/config.js"></script>       
@@ -12,7 +13,12 @@
         <script src="scripts/view.js"></script>
         <script src="scripts/script.js"></script>
         <!--<script src="scripts/game.js"></script>-->
+        <link rel="stylesheet" type="text/css" href="lib/jquery-ui/jquery-ui.min.css">
         <style type="text/css">
+            html {
+                background-color: darkgrey;
+                color: green;
+            }
             canvas {
                 margin: 0 auto;
 
@@ -21,13 +27,18 @@
                 font-size: 2em;
                 text-align: center;
             }
+
         </style>
     </head>
     <body>
-        <h1>phaser</h1>
+        <h1>Drug Lord</h1>
         
         <div id="characterWindow"></div>
+        <div id="marketWindow"></div>
 
+
+
+        <!-- TEMPLATES -->
         <template id="insertCharacter">
             <!-- INSERT CHARACTER -->
             <form>
@@ -56,9 +67,9 @@
         </template>
 
         <template id="character">
-            <span id="characterName"></span>
-            <span id="characterType"></span>
-            <span id="characterMoney"></span>
+            <div id="characterName"></div>
+            <div id="characterType"></div>
+            <div id="characterMoney"></div>
             <script type="text/javascript">
             (function(){
                 var curCharacter = App.model.players[App.model.state.currentCharacter];
@@ -70,23 +81,89 @@
                 $money.html(curCharacter.money);
             })()
             </script>
+            
+            <style type="text/css">
+                #characterWindow{
+                    width: 45%;
+                    float: left;
+                    border: 2px solid green; 
+                }
+            </style>
         </template>
 
         <template id="market">
-            <span id="characterName"></span>
-            <span id="characterType"></span>
-            <span id="characterMoney"></span>
+            <div class="envHeader">
+                <div id="environmentName"></div>
+                <div id="environmentDesc"></div>
+            </div>
+            <div class="envMarket">
+                <div id="drugs"></div>
+            </div>
+            
+            <div id="characterType"></div>
+            <div id="characterMoney"></div>
             <script type="text/javascript">
             (function(){
-                var curEnvironment = App.model.state.currentEnvironment;
-                var $name = jQuery('#characterName');
-                var $type = jQuery('#characterType');
-                var $money = jQuery('#characterMoney');
-                $name.html(curEnvironment.name);
-                $type.html(curEnvironment.type);
-                $money.html(curEnvironment.money);
+                var curEnvironmentName = App.model.state.currentEnvironment,
+                    environment = App.model.environments[curEnvironmentName],
+                    envDrugs = environment.goods.drugs,
+                    $name = jQuery('#environmentName'),
+                    $drugs = jQuery('#drugs');
+                //var $money = jQuery('#characterMoney');
+                $name.html(environment.name);
+                var drugKeys = Object.keys(envDrugs.types);
+                var i = 0;
+                for(var drug in envDrugs.types){
+                    $cont = jQuery('<div class="drug" data-drug='+ drugKeys[i] +'></div>');
+                    $cont.append('<div class="label">' + envDrugs.types[drug].label + '</div>');
+                    $cont.append('<div class="availability" data-qty='+ envDrugs.types[drug].availability +'>' + envDrugs.types[drug].availability + '</div>');
+                    $cont.append('<div class="price"><span>Prezzo</span>' + envDrugs.types[drug].price + '</div>');
+                    $cont.append('<div><div class="quantityController" data-max-qty="'+ envDrugs.types[drug].availability +'"></div><span class="cart"></span><button class="submitQty controllerBuy" data-qty>Buy</button></div>');
+                    $cont.append('<div><div class="quantityController" data-max-qty="'+ envDrugs.types[drug].availability +'"></div><span class="cart"></span><button class="submitQty controllerSell" data-qty>Sell</button></div>');
+                    $drugs.append($cont);
+
+                    i += 1;
+                }
+
+                jQuery( ".quantityController" ).each(function(){
+                    var self = jQuery(this);
+                    debugger;
+                    self.slider({
+                        range: "max",
+                        min: 0,
+                        max: self.parents('.drug').find('.availability').attr('data-qty'),
+                        value: 1,
+                        slide: function( event, ui ) {
+                            //debugger;
+                            self.siblings('.submitQty').attr('data-qty', ui.value);
+                            self.siblings('.cart').html(ui.value)
+                        }
+                    });
+                });
+
+                jQuery('.submitQty').each(function(){
+                    var self = jQuery(this); 
+                    self.on('click', function(){
+                        var good = self.parent('.drug').attr('data-drug');
+                        var qty = self.attr('data-qty');
+                        amplify.publish('Player:buyGood', {good, qty});
+                    });
+                });
+                //$type.html(curEnvironment.type);
+                //$money.html(curEnvironment.money);
             })()
             </script>
+            <style>
+                #marketWindow{
+                    width: 45%;
+                    float: left;
+                    border: 2px solid green; 
+                }
+                .drug {
+                    border: 1px solid red;
+                    padding: 10px;
+                }
+            </style>
         </template>
 
     </body>
